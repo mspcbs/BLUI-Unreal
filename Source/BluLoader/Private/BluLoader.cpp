@@ -10,6 +10,7 @@
 
 class FBluLoader : public IBluLoader
 {
+	void* CefHandle = nullptr;
 
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override
@@ -19,8 +20,22 @@ class FBluLoader : public IBluLoader
 		// If we're on Windows we need to load DLLs from our custom path
 		#if PLATFORM_WINDOWS
 			LibPath += "Win/shipping/";
+
+			// Load our uniquely named CEF runtime by full path so the Blu module's delay-loaded imports bind to it
+			// and never to the engine's libcef.dll. Pop the directory afterwards so we don't redirect unrelated
+			// bare-name DLL loads (d3dcompiler_47, dxcompiler, vulkan-1, ...) in the rest of the process to our folder.
 			FPlatformProcess::PushDllDirectory(*LibPath);
-            UE_LOG(LogBluLoader, Log, TEXT("patched dll directory paths"));
+			CefHandle = FPlatformProcess::GetDllHandle(*(LibPath + TEXT("blucef.dll")));
+			FPlatformProcess::PopDllDirectory(*LibPath);
+
+			if (CefHandle)
+			{
+				UE_LOG(LogBluLoader, Log, TEXT("loaded isolated CEF runtime from %s"), *LibPath);
+			}
+			else
+			{
+				UE_LOG(LogBluLoader, Error, TEXT("failed to load %sblucef.dll (error %d), BLUI will not work"), *LibPath, FPlatformMisc::GetLastError());
+			}
 		#endif
         
         #if PLATFORM_MAC

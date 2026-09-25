@@ -2,6 +2,18 @@
 
 Current CEF building instructions: https://github.com/getnamo/blubrowser
 
+#### Isolating the CEF runtime (required, Windows)
+
+The engine ships its own CEF (`Engine/Binaries/ThirdParty/CEF3`) for the WebBrowser module. Windows binds DLLs imported by bare name to whichever module of that name is already loaded, so two `libcef.dll`s in one process end up sharing one Chromium: the second `CefInitialize` silently becomes a no-op and one side runs with the other's settings, subprocess and version.
+
+After copying a new CEF drop (`Release` + `Resources` files) and a freshly built `BluBrowserProcess.exe` into `ThirdParty/cef/Win/shipping` and `libcef.lib` into `ThirdParty/cef/Win/lib`, run:
+
+```
+powershell -ExecutionPolicy Bypass -File builder/isolate_cef.ps1
+```
+
+It renames `libcef.dll` -> `blucef.dll` and `chrome_elf.dll` -> `blucef_elf.dll` (same-length names, patched in the import/export tables and the runtime `GetModuleHandle` name tables), patches `BluBrowserProcess.exe` to import `blucef.dll` and generates `lib/blucef.lib`. The script checks the number of patched references and aborts if a new CEF version changes them, so review it when bumping CEF.
+
 #### Archived - Windows Steps
 
 Requirements:

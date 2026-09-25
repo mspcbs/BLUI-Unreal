@@ -8,6 +8,8 @@ A fork of BLUI that is kept relatively up to date.
 
 Latest release is updated to [CEF 128.0.6613.138](https://bitbucket.org/chromiumembedded/cef/src/6613/). See https://github.com/getnamo/BLUbrowser for repo for cef process build.
 
+Since v5.1.0 BLUI's CEF runtime ships as `blucef.dll` / `blucef_elf.dll` instead of `libcef.dll` / `chrome_elf.dll`, so it runs side by side with the engine's own CEF (WebBrowser widget, editor web views) in the same process without either one hijacking the other. If you drop in your own CEF build, run `builder/isolate_cef.ps1` afterwards to apply the rename.
+
 To install check out the latest releases https://github.com/getnamo/BLUI-Unreal/releases and drag and drop *Plugins* folder into your project root folder
 
 [Discord Server](https://discord.gg/qfJUyxaW4s)

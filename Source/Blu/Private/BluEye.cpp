@@ -87,6 +87,11 @@ void UBluEye::Init()
 		nullptr,
 		nullptr);
 
+	if (!Browser)
+	{
+		UE_LOG(LogBlu, Error, TEXT("Failed to create browser, was CEF initialized? (see LogBlu startup status)"));
+		return;
+	}
 
 	Browser->GetHost()->SetWindowlessFrameRate(Settings.FrameRate);
 	Browser->GetHost()->SetAudioMuted(Settings.bAudioMuted);
@@ -191,7 +196,7 @@ void UBluEye::TextureUpdate(const void *Buffer, FUpdateTextureRegion2D *UpdateRe
 			{
 				for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; RegionIndex++)
 				{
-					RHIUpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, RegionData->SrcData.GetData());
+					CommandList.UpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, RegionData->SrcData.GetData());
 				}
 
 				FMemory::Free(RegionData->Regions);

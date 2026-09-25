@@ -45,18 +45,12 @@ public class Blu : ModuleRules
 		if(Target.Platform == UnrealTargetPlatform.Win64)
 		{
 
-			PublicAdditionalLibraries.Add(Path.Combine(ThirdPartyPath, "cef/Win/lib", "libcef.lib"));
+			// BLUI's CEF runtime is renamed (libcef.dll -> blucef.dll, chrome_elf.dll -> blucef_elf.dll, see builder/isolate_cef.ps1)
+			// so it can't collide with the engine's own CEF (WebBrowser module) which is loaded into the same process by name.
+			PublicAdditionalLibraries.Add(Path.Combine(ThirdPartyPath, "cef/Win/lib", "blucef.lib"));
 			PublicAdditionalLibraries.Add(Path.Combine(ThirdPartyPath, "cef/Win/lib", "libcef_dll_wrapper.lib"));
 
-            PublicDelayLoadDLLs.Add("chrome_elf.dll");
-            PublicDelayLoadDLLs.Add("d3dcompiler_47.dll");
-			PublicDelayLoadDLLs.Add("dxcompiler.dll");
-			PublicDelayLoadDLLs.Add("ffmpegsumo.dll");
-			PublicDelayLoadDLLs.Add("dxil.dll");
-			PublicDelayLoadDLLs.Add("libcef.dll");
-            PublicDelayLoadDLLs.Add("libEGL.dll");
-            PublicDelayLoadDLLs.Add("libGLESv2.dll");
-			PublicDelayLoadDLLs.Add("vulkan-1.dll");
+			PublicDelayLoadDLLs.Add("blucef.dll");
 
 			PublicIncludePaths.AddRange(
 				new string[] {
